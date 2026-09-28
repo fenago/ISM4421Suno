@@ -6,6 +6,9 @@
 <title>SongForge — AI Music Studio</title>
 <meta name="description" content="Generate full songs, instrumentals and lyrics with AI.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+<script>
+  try { const t = localStorage.getItem("sf.theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,19 +27,57 @@
     --err: #ef4444;
     --radius: 14px;
     --grad: linear-gradient(135deg, var(--accent), var(--accent-2));
+    --link: #c4b5fd;
+    --err-text: #fca5a5;
+    --glow-1: #2a1650;
+    --glow-2: #3b0f33;
+    --shadow: rgba(0,0,0,.4);
+    --scrim: rgba(0,0,0,.6);
+    color-scheme: dark;
+  }
+  /* Light theme: explicit choice, or the OS preference when no choice was made */
+  :root[data-theme="light"] {
+    --bg: #f7f6fb;
+    --panel: #ffffff;
+    --panel-2: #f1f0f7;
+    --border: #dddbe8;
+    --text: #1a1830;
+    --muted: #625f7a;
+    --accent: #7c3aed;
+    --accent-2: #db2777;
+    --ok: #16a34a;
+    --warn: #b45309;
+    --err: #dc2626;
+    --link: #6d28d9;
+    --err-text: #b91c1c;
+    --glow-1: #e9dcff;
+    --glow-2: #ffdcef;
+    --shadow: rgba(40,30,80,.14);
+    --scrim: rgba(20,16,40,.35);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+      --bg: #f7f6fb; --panel: #ffffff; --panel-2: #f1f0f7; --border: #dddbe8;
+      --text: #1a1830; --muted: #625f7a; --accent: #7c3aed; --accent-2: #db2777;
+      --ok: #16a34a; --warn: #b45309; --err: #dc2626; --link: #6d28d9; --err-text: #b91c1c;
+      --glow-1: #e9dcff; --glow-2: #ffdcef; --shadow: rgba(40,30,80,.14); --scrim: rgba(20,16,40,.35);
+      color-scheme: light;
+    }
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body {
-    background: radial-gradient(1200px 600px at 10% -10%, #2a1650 0%, transparent 60%),
-                radial-gradient(900px 500px at 110% 10%, #3b0f33 0%, transparent 55%), var(--bg);
+    background: radial-gradient(1200px 600px at 10% -10%, var(--glow-1) 0%, transparent 60%),
+                radial-gradient(900px 500px at 110% 10%, var(--glow-2) 0%, transparent 55%), var(--bg);
     background-attachment: fixed;
     color: var(--text);
     font: 15px/1.5 Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     min-height: 100vh;
   }
   button, input, select, textarea { font: inherit; color: inherit; }
-  a { color: #c4b5fd; }
+  a { color: var(--link); }
+  body, .card, .btn, input, textarea, select, .chip, .track { transition: background-color .2s, border-color .2s, color .2s; }
 
   .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px 64px; }
   header {
@@ -128,7 +169,7 @@
   .job .meta b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .job .meta small { color: var(--muted); }
   .job.failed { border-color: color-mix(in srgb, var(--err) 60%, transparent); }
-  .job.failed small { color: #fca5a5; }
+  .job.failed small { color: var(--err-text); }
   .spinner { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--border); border-top-color: var(--accent); animation: spin 1s linear infinite; flex: none; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .steps { display: flex; gap: 4px; margin-top: 6px; }
@@ -154,7 +195,7 @@
   }
 
   /* modal */
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50; backdrop-filter: blur(4px); }
+  .modal { position: fixed; inset: 0; background: var(--scrim); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50; backdrop-filter: blur(4px); }
   .modal.open { display: flex; }
   .modal .card { width: 100%; max-width: 520px; max-height: 90vh; overflow: auto; }
   .modal h3 { margin: 0 0 4px; }
@@ -164,12 +205,16 @@
 
   /* toast */
   #toasts { position: fixed; right: 16px; bottom: 16px; left: 16px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; z-index: 60; pointer-events: none; }
-  .toast { pointer-events: auto; background: var(--panel); border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 10px 14px; border-radius: 10px; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,.4); font-size: 14px; animation: pop .2s ease-out; }
+  .toast { pointer-events: auto; background: var(--panel); border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 10px 14px; border-radius: 10px; max-width: 380px; box-shadow: 0 10px 30px var(--shadow); font-size: 14px; animation: pop .2s ease-out; }
   .toast.err { border-left-color: var(--err); }
   .toast.ok { border-left-color: var(--ok); }
   @keyframes pop { from { transform: translateY(8px); opacity: 0; } }
 
   .key-banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; padding: 12px 16px; border-radius: var(--radius); border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent); background: color-mix(in srgb, var(--accent) 14%, var(--panel)); }
+  .greet { color: var(--muted); font-weight: 500; font-size: 14px; }
+  .greet b { color: var(--text); }
+  @media (max-width: 520px) { .greet { display: none; } }
+  .btn.cta { background: var(--grad); border: 0; color: #fff; }
   footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 40px; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   [hidden] { display: none !important; }
@@ -180,18 +225,20 @@
   <header>
     <div class="brand"><div class="logo">🎵</div> SongForge</div>
     <div class="head-actions">
+      <span class="greet" id="greet" hidden></span>
       <span class="pill" id="creditsPill" title="Remaining API credits">Credits: <b id="credits">—</b></span>
+      <button class="btn icon" id="themeToggle" type="button" aria-label="Switch theme" title="Switch theme">🌙</button>
       <button class="btn icon" id="openSettings" title="Settings" aria-label="Settings">⚙️</button>
     </div>
   </header>
 
   <section class="hero">
-    <h1>Turn an idea into a <span>finished song</span></h1>
-    <p>Describe it, pick a style, and get two full tracks in about a minute.</p>
+    <h1 id="heroTitle">Turn an idea into a <span>finished song</span></h1>
+    <p id="heroSub">Describe it, pick a style, and get two full tracks in about a minute.</p>
   </section>
 
   <div class="key-banner" id="keyBanner" hidden>
-    <span>🔑 <b>Add your Suno API key to start making music.</b> It stays in your browser.</span>
+    <span>🔑 <b id="keyBannerText">Add your Suno API key to start making music.</b> It stays in your browser.</span>
     <button class="btn sm" id="keyBannerBtn" type="button">Add API key</button>
   </div>
 
@@ -277,7 +324,7 @@
       <div class="tracks" id="tracks"></div>
       <div class="empty" id="empty">
         <div class="big">🎧</div>
-        <p>No songs yet. Describe one on the left and hit <b>Generate</b>.</p>
+        <p id="emptyText">No songs yet. Describe one on the left and hit <b>Generate</b>.</p>
       </div>
     </section>
   </div>
@@ -289,6 +336,15 @@
 <div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
   <div class="card">
     <h3 id="settingsTitle">Settings</h3>
+    <label class="f" for="userName">Your name</label>
+    <input type="text" id="userName" maxlength="40" placeholder="What should we call you?" autocomplete="given-name">
+    <label class="f" for="themeSelect">Theme</label>
+    <select id="themeSelect">
+      <option value="system">Match my device</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+    <hr style="border:0;border-top:1px solid var(--border);margin:18px 0 12px">
     <p class="sub">SongForge uses your own Suno API key. Get one at <a href="https://sunoapi.org/api-key" target="_blank" rel="noopener">sunoapi.org</a>. It's saved only in this browser and sent only to the Suno API.</p>
     <label class="f" for="apiKey">Suno API key</label>
     <div class="row">
@@ -298,7 +354,21 @@
     <div class="modal-foot">
       <button class="btn danger" id="clearLibrary" type="button" style="margin-right:auto">Clear library</button>
       <button class="btn ghost" data-close type="button">Cancel</button>
-      <button class="btn" id="saveSettings" type="button" style="background:var(--grad);border:0;color:#fff">Save</button>
+      <button class="btn cta" id="saveSettings" type="button">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Welcome modal -->
+<div class="modal" id="welcomeModal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+  <div class="card" style="max-width:420px;text-align:center">
+    <div style="font-size:40px">👋</div>
+    <h3 id="welcomeTitle">Welcome to SongForge</h3>
+    <p class="sub">Before we make some music, what should I call you?</p>
+    <input type="text" id="welcomeName" maxlength="40" placeholder="Your first name" autocomplete="given-name" style="text-align:center">
+    <div class="modal-foot" style="justify-content:center">
+      <button class="btn ghost" id="welcomeSkip" type="button">Skip</button>
+      <button class="btn cta" id="welcomeGo" type="button">Let's go</button>
     </div>
   </div>
 </div>
@@ -313,7 +383,7 @@
     <div id="lyricsResults" style="margin-top:12px"></div>
     <div class="modal-foot">
       <button class="btn ghost" data-close type="button">Close</button>
-      <button class="btn" id="lyricsGo" type="button" style="background:var(--grad);border:0;color:#fff">Generate lyrics</button>
+      <button class="btn cta" id="lyricsGo" type="button">Generate lyrics</button>
     </div>
   </div>
 </div>
@@ -331,7 +401,7 @@
     <textarea id="exLyrics" class="lyrics" maxlength="5000" placeholder="[Bridge]&#10;..."></textarea>
     <div class="modal-foot">
       <button class="btn ghost" data-close type="button">Cancel</button>
-      <button class="btn" id="extendGo" type="button" style="background:var(--grad);border:0;color:#fff">Extend</button>
+      <button class="btn cta" id="extendGo" type="button">Extend</button>
     </div>
   </div>
 </div>
@@ -370,7 +440,7 @@
   };
   const POLL_MS = 8000;
   const MAX_WAIT_MS = 12 * 60 * 1000;
-  const LS = { tracks: "sf.tracks", jobs: "sf.jobs", key: "sf.apiKey", mode: "sf.mode" };
+  const LS = { tracks: "sf.tracks", jobs: "sf.jobs", key: "sf.apiKey", mode: "sf.mode", name: "sf.name", theme: "sf.theme", welcomed: "sf.welcomed" };
   const STYLE_PRESETS = ["Pop", "Hip-hop", "Lo-fi chill", "Rock", "EDM", "R&B", "Country", "Jazz", "Cinematic orchestral", "Reggaeton", "Acoustic folk", "Synthwave"];
   const STAGES = ["PENDING", "TEXT_SUCCESS", "FIRST_SUCCESS", "SUCCESS"];
   const FAIL = ["CREATE_TASK_FAILED", "GENERATE_AUDIO_FAILED", "CALLBACK_EXCEPTION", "SENSITIVE_WORD_ERROR", "GENERATE_LYRICS_FAILED", "GENERATE_WAV_FAILED"];
@@ -400,6 +470,46 @@
   const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
   const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // ---------- personalization ----------
+  const userName = () => (load(LS.name, "") || "").trim();
+  const hey = (fallback = "") => (userName() ? `${userName()}` : fallback);
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+  function applyName() {
+    const n = userName();
+    $("#greet").hidden = !n;
+    $("#greet").innerHTML = n ? `Hey, <b>${esc(n)}</b> 👋` : "";
+    $("#heroTitle").innerHTML = n
+      ? `What are we making today, <span>${esc(n)}</span>?`
+      : `Turn an idea into a <span>finished song</span>`;
+    $("#heroSub").textContent = n
+      ? "Describe it, pick a style, and I'll hand you two full tracks in about a minute."
+      : "Describe it, pick a style, and get two full tracks in about a minute.";
+    $("#keyBannerText").textContent = n ? `${n}, add your Suno API key to start making music.` : "Add your Suno API key to start making music.";
+    $("#emptyText").innerHTML = n
+      ? `Your stage is empty, ${esc(n)}. Describe a song on the left and hit <b>Generate</b>.`
+      : "No songs yet. Describe one on the left and hit <b>Generate</b>.";
+  }
+
+  // ---------- theme ----------
+  const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+  function currentTheme() {
+    const t = document.documentElement.dataset.theme;
+    return t || (systemDark.matches ? "dark" : "light");
+  }
+  function setTheme(choice) {
+    if (choice === "light" || choice === "dark") document.documentElement.dataset.theme = choice;
+    else delete document.documentElement.dataset.theme;
+    try { localStorage.setItem(LS.theme, choice); } catch {}
+    syncThemeButton();
+  }
+  function syncThemeButton() {
+    const dark = currentTheme() === "dark";
+    $("#themeToggle").textContent = dark ? "☀️" : "🌙";
+    $("#themeToggle").title = dark ? "Switch to light theme" : "Switch to dark theme";
+  }
+  systemDark.addEventListener?.("change", syncThemeButton);
 
   function toast(msg, type = "") {
     const el = document.createElement("div");
@@ -534,7 +644,11 @@
       const data = await call("generate", payload);
       const label = payload.title || (payload.prompt || payload.lyrics || payload.style || "New song").slice(0, 60);
       addJob({ taskId: data.taskId, kind: "generate", label, model: payload.model, status: "PENDING", started: Date.now() });
-      toast("Song queued! It usually takes 1–3 minutes.", "ok");
+      toast(pick([
+        `On it${userName() ? `, ${userName()}` : ""}! Your song is in the studio — usually 1–3 minutes.`,
+        `Rolling tape${userName() ? ` for ${userName()}` : ""} 🎙️ — give it 1–3 minutes.`,
+        `Queued${userName() ? `, ${userName()}` : ""}! The band is warming up.`,
+      ]), "ok");
     } catch (err) {
       toast(err.message, "err");
     } finally {
@@ -592,7 +706,9 @@
         if (job.status === "SUCCESS") {
           jobs = jobs.filter((j) => j !== job);
           persist(); render();
-          toast(`“${job.label}” is ready 🎉`, "ok");
+          toast(userName()
+            ? pick([`${userName()}, “${job.label}” is ready 🎉`, `Fresh out of the studio, ${userName()}: “${job.label}” 🎧`, `Nice one, ${userName()} — “${job.label}” is done!`])
+            : `“${job.label}” is ready 🎉`, "ok");
           refreshCredits();
           return;
         }
@@ -719,7 +835,7 @@
       try { await navigator.clipboard.writeText(t.audio); toast("Audio link copied", "ok"); }
       catch { window.prompt("Copy this link:", t.audio); }
     } else if (act === "del") {
-      if (!confirm(`Remove “${t.title}” from your library?`)) return;
+      if (!confirm(`${userName() ? `${userName()}, remove` : "Remove"} “${t.title}” from your library?`)) return;
       tracks = tracks.filter((x) => x !== t); persist(); render();
     }
   });
@@ -740,7 +856,7 @@
         if (!wavTaskId) break;
         const d = await call("wavStatus", { taskId: wavTaskId });
         const url = d.response?.audioWavUrl || d.response?.audio_wav_url;
-        if (url) { t.wav = url; persist(); render(); toast("WAV ready — click ⬇ WAV", "ok"); refreshCredits(); return; }
+        if (url) { t.wav = url; persist(); render(); toast(`${userName() ? `${userName()}, your` : "Your"} WAV is ready — click ⬇ WAV`, "ok"); refreshCredits(); return; }
         if (FAIL.includes(d.successFlag)) throw new Error("WAV conversion failed.");
       }
       throw new Error("WAV conversion is taking longer than expected. Try again in a minute.");
@@ -760,6 +876,9 @@
   // Settings
   function openSettings() {
     $("#apiKey").value = load(LS.key, "");
+    $("#userName").value = userName();
+    let t = "system"; try { t = localStorage.getItem(LS.theme) || "system"; } catch {}
+    $("#themeSelect").value = t;
     openModal("#settingsModal");
     setTimeout(() => $("#apiKey").focus(), 50);
   }
@@ -770,13 +889,32 @@
   });
   $("#saveSettings").addEventListener("click", async (e) => {
     const key = $("#apiKey").value.trim();
+    const hadKey = !!load(LS.key, "");
     save(LS.key, key);
+    save(LS.name, $("#userName").value.trim());
+    applyName();
     closeModal(e.target);
     updateKeyState();
-    if (!key) return toast("API key removed", "ok");
+    if (!key) return toast(hadKey ? "API key removed" : "Settings saved", "ok");
     const ok = await refreshCredits();
-    toast(ok ? "API key saved and verified ✓" : "Key saved, but the Suno API rejected it — double-check it.", ok ? "ok" : "err");
+    toast(ok ? `You're all set${userName() ? `, ${userName()}` : ""} — API key verified ✓` : "Key saved, but the Suno API rejected it — double-check it.", ok ? "ok" : "err");
   });
+  $("#themeSelect").addEventListener("change", (e) => setTheme(e.target.value));
+  $("#themeToggle").addEventListener("click", () => setTheme(currentTheme() === "dark" ? "light" : "dark"));
+
+  // Welcome (first visit)
+  function finishWelcome(name) {
+    save(LS.welcomed, true);
+    if (name) save(LS.name, name);
+    applyName();
+    $("#welcomeModal").classList.remove("open");
+    if (name) toast(`Great to meet you, ${name}! Let's make something.`, "ok");
+    if (!load(LS.key, "")) setTimeout(openSettings, 350);
+  }
+  $("#welcomeGo").addEventListener("click", () => finishWelcome($("#welcomeName").value.trim()));
+  $("#welcomeSkip").addEventListener("click", () => finishWelcome(""));
+  $("#welcomeName").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#welcomeGo").click(); });
+
   $("#apiKey").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#saveSettings").click(); });
 
   function updateKeyState() {
@@ -827,7 +965,7 @@
         $("#cLyrics").value = x.text; $("#cLyrics").dispatchEvent(new Event("input"));
         if (!$("#cTitle").value && x.title) $("#cTitle").value = x.title.slice(0, 80);
         $("#instrumental").checked = false; $("#instrumental").dispatchEvent(new Event("change"));
-        closeModal(e.target); toast("Lyrics added to the composer", "ok");
+        closeModal(e.target); toast(`Lyrics added${userName() ? `, ${userName()}` : ""} — tweak them or hit Generate.`, "ok");
       };
       refreshCredits();
     } catch (err) {
@@ -859,7 +997,7 @@
     try {
       const d = await call("extend", p);
       addJob({ taskId: d.taskId, kind: "extend", label: t.title, parentTitle: t.title, model: p.model, status: "PENDING", started: Date.now() });
-      closeModal(e.target); toast("Extension queued!", "ok");
+      closeModal(e.target); toast(`Extension queued${userName() ? `, ${userName()}` : ""}! Same song, more to love.`, "ok");
     } catch (err) { toast(err.message, "err"); }
     finally { btn.disabled = false; }
   });
@@ -904,7 +1042,13 @@
 
   // ---------- init ----------
   setMode(mode);
+  syncThemeButton();
+  applyName();
   updateKeyState();
+  if (!load(LS.welcomed, false) && !userName()) {
+    openModal("#welcomeModal");
+    setTimeout(() => $("#welcomeName").focus(), 50);
+  }
   jobs = jobs.filter((j) => !j.error);
   render();
   if (load(LS.key, "")) jobs.forEach(poll); // resume any in-flight generations after reload

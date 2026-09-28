@@ -10,6 +10,8 @@ A single-page app for generating music with the [Suno API](https://docs.sunoapi.
 - **Live progress**: you can stream the first take before the final files are ready. In-progress jobs pick up again after a page reload.
 - **Library** saved in the browser: play, search, download MP3, convert and download WAV, **extend** a track from any point, view or reuse lyrics, copy the audio link, delete.
 - A remaining-credits display in the header.
+- **Light and dark themes**: follows the device setting by default; the ☀️/🌙 button or Settings overrides it.
+- **Personalized**: asks your name on the first visit and uses it throughout (editable in Settings).
 
 ## API key
 Each user brings their own Suno API key (get one at https://sunoapi.org/api-key).
